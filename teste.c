@@ -36,5 +36,22 @@ int main(void) {
     printf("col 0, width 1: %.2f\n",
            col_to_real(0, 1));
 
+           printf("\n=== Teste row_to_imag ===\n");
+
+    printf("row 0, height 4: %.2f\n",
+       row_to_imag(0, 4));
+
+    printf("row 1, height 4: %.2f\n",
+       row_to_imag(1, 4));
+
+    printf("row 2, height 4: %.2f\n",
+       row_to_imag(2, 4));
+
+    printf("row 3, height 4: %.2f\n",
+       row_to_imag(3, 4));
+
+    printf("row 0, height 1: %.2f\n",
+       row_to_imag(0, 1));
+
     return 0;
 }

@@ -30,3 +30,11 @@ double col_to_real(int col, int width) {
 
     return REAL_MIN + (double) col * (REAL_MAX - REAL_MIN) / (double) (width - 1);
 }
+
+double row_to_imag(int row, int height) {
+    if (height <= 1) {
+        return IMAG_MIN;
+    }
+
+    return IMAG_MIN + (double) row * (IMAG_MAX - IMAG_MIN) / (double) (height - 1);
+}
