@@ -8,5 +8,6 @@
 #define IMAG_MAX (1.5)
 
 int mandelbrot_ponto(double cr, double ci, int max_iter);
+double col_to_real(int col, int width);
 
 #endif

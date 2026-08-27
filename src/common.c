@@ -22,3 +22,11 @@ int mandelbrot_ponto(double cr, double ci, int max_iter) {
 
     return iter;
 }
+
+double col_to_real(int col, int width) {
+    if (width <= 1) {
+        return REAL_MIN;
+    }
+
+    return REAL_MIN + (double) col * (REAL_MAX - REAL_MIN) / (double) (width - 1);
+}
