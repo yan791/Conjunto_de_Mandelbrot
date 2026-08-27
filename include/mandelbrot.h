@@ -10,5 +10,6 @@
 int mandelbrot_ponto(double cr, double ci, int max_iter);
 double col_to_real(int col, int width);
 double row_to_imag(int row, int height);
+unsigned char iterations_to_intensity(int iterations, int max_iter);
 
 #endif

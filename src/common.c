@@ -38,3 +38,22 @@ double row_to_imag(int row, int height) {
 
     return IMAG_MIN + (double) row * (IMAG_MAX - IMAG_MIN) / (double) (height - 1);
 }
+
+unsigned char iterations_to_intensity(int iterations, int max_iter) {
+    if (max_iter <= 0) {
+        return 0;
+    }
+
+    double proporcao = (double) iterations / (double) max_iter;
+    int valor = (int) (proporcao * 255.0 + 0.5);
+
+    if (valor < 0) {
+        valor = 0;
+    }
+
+    if (valor > 255) {
+        valor = 255;
+    }
+
+    return (unsigned char) valor;
+}
