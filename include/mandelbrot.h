@@ -12,4 +12,12 @@ double col_to_real(int col, int width);
 double row_to_imag(int row, int height);
 unsigned char iterations_to_intensity(int iterations, int max_iter);
 
+typedef struct {
+    int largura;
+    int altura;
+    int max_iter;
+    int threads;
+} config;
+
+void compute_serial(unsigned char *image, const config *config);
 #endif

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "mandelbrot.h"
 
 int main(void) {
@@ -77,6 +78,39 @@ int main(void) {
 
     printf("-10 / 100: %d\n",
            iterations_to_intensity(-10, 100));
+
+
+    printf("\n=== Teste compute_serial ===\n");
+
+    config cfg;
+
+    cfg.largura = 4;
+    cfg.altura = 4;
+    cfg.max_iter = 100;
+    cfg.threads = 1;
+
+    size_t total_pixels = (size_t) cfg.largura * cfg.altura;
+
+    unsigned char *image = malloc(total_pixels * sizeof(unsigned char));
+
+    if (image == NULL) {
+        printf("Erro ao alocar memoria.\n");
+        return 1;
+    }
+
+    compute_serial(image, &cfg);
+
+    printf("Imagem 4x4:\n");
+
+    for (int row = 0; row < cfg.altura; row++) {
+        for (int col = 0; col < cfg.largura; col++) {
+            printf("%d ", image[(size_t) row * cfg.largura + col]);
+        }
+
+        printf("\n");
+    }
+
+    free(image);
 
     return 0;
 }
