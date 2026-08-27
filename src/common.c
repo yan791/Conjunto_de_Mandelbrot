@@ -57,3 +57,22 @@ unsigned char iterations_to_intensity(int iterations, int max_iter) {
 
     return (unsigned char) valor;
 }
+
+unsigned char *alloca_imagem(int width, int height) {
+    if (width <= 0 || height <= 0) {
+        return NULL;
+    }
+
+    size_t w = (size_t) width;
+    size_t h = (size_t) height;
+
+    if (w != 0 && h > (SIZE_MAX / w)) {
+        return NULL;
+    }
+
+    size_t total = w * h;
+
+    unsigned char *imagem = (unsigned char *) malloc(total * sizeof(unsigned char));
+
+    return imagem;
+}

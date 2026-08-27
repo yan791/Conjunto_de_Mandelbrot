@@ -19,5 +19,6 @@ typedef struct {
     int threads;
 } config;
 
+unsigned char *alloca_imagem(int width, int height);
 void compute_serial(unsigned char *image, const config *config);
 #endif
