@@ -1,112 +1,122 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include "mandelbrot.h"
 
 int main(void) {
 
-    printf("=== TESTE 1: imagem 4x4 ===\n");
+    printf("=== TESTE 1: salvar imagem normalmente ===\n");
 
-    int width = 4;
-    int height = 4;
+    int width = 2;
+    int height = 3;
 
-    unsigned char *imagem = alloca_imagem(width, height);
+    unsigned char imagem_teste[] = {
+        10, 20,
+        30, 40,
+        50, 60
+    };
 
-    if (imagem == NULL) {
-        printf("ERRO: memoria nao foi alocada.\n");
-        return 1;
+    int resultado = pgm_salva(
+        "teste.pgm",
+        imagem_teste,
+        width,
+        height
+    );
+
+    if (resultado == 0) {
+        printf("Arquivo salvo com sucesso.\n");
+    } else {
+        printf("ERRO: nao foi possivel salvar o arquivo.\n");
     }
 
-    printf("Memoria alocada com sucesso.\n");
 
-    for (int i = 0; i < width * height; i++) {
-        imagem[i] = (unsigned char) i;
-    }
+    printf("\n=== TESTE 2: verificar arquivo gerado ===\n");
 
-    printf("Valores armazenados:\n");
+    FILE *fp = fopen("teste.pgm", "r");
 
-    for (int row = 0; row < height; row++) {
-        for (int col = 0; col < width; col++) {
-            printf("%d ", imagem[row * width + col]);
+    if (fp == NULL) {
+        printf("ERRO: o arquivo teste.pgm nao existe.\n");
+    } else {
+        char linha[100];
+
+        while (fgets(linha, sizeof(linha), fp) != NULL) {
+            printf("%s", linha);
         }
 
-        printf("\n");
-    }
-
-    free(imagem);
-
-
-    printf("\n=== TESTE 2: largura zero ===\n");
-
-    imagem = alloca_imagem(0, 10);
-
-    if (imagem == NULL) {
-        printf("OK: largura zero foi rejeitada.\n");
-    } else {
-        printf("ERRO: largura zero foi aceita.\n");
-        free(imagem);
+        fclose(fp);
     }
 
 
-    printf("\n=== TESTE 3: altura zero ===\n");
+    printf("\n=== TESTE 3: filename NULL ===\n");
 
-    imagem = alloca_imagem(10, 0);
+    resultado = pgm_salva(
+        NULL,
+        imagem_teste,
+        width,
+        height
+    );
 
-    if (imagem == NULL) {
-        printf("OK: altura zero foi rejeitada.\n");
-    } else {
-        printf("ERRO: altura zero foi aceita.\n");
-        free(imagem);
-    }
-
-
-    printf("\n=== TESTE 4: largura negativa ===\n");
-
-    imagem = alloca_imagem(-5, 10);
-
-    if (imagem == NULL) {
-        printf("OK: largura negativa foi rejeitada.\n");
-    } else {
-        printf("ERRO: largura negativa foi aceita.\n");
-        free(imagem);
-    }
+    printf("Resultado: %d\n", resultado);
 
 
-    printf("\n=== TESTE 5: altura negativa ===\n");
+    printf("\n=== TESTE 4: image NULL ===\n");
 
-    imagem = alloca_imagem(10, -5);
+    resultado = pgm_salva(
+        "erro.pgm",
+        NULL,
+        width,
+        height
+    );
 
-    if (imagem == NULL) {
-        printf("OK: altura negativa foi rejeitada.\n");
-    } else {
-        printf("ERRO: altura negativa foi aceita.\n");
-        free(imagem);
-    }
+    printf("Resultado: %d\n", resultado);
 
 
-    printf("\n=== TESTE 6: tamanho da imagem ===\n");
+    printf("\n=== TESTE 5: width zero ===\n");
 
-    width = 10;
-    height = 20;
+    resultado = pgm_salva(
+        "erro.pgm",
+        imagem_teste,
+        0,
+        height
+    );
 
-    imagem = alloca_imagem(width, height);
+    printf("Resultado: %d\n", resultado);
 
-    if (imagem == NULL) {
-        printf("ERRO: nao conseguiu alocar imagem 10x20.\n");
-        return 1;
-    }
 
-    size_t total_esperado = (size_t) width * height;
+    printf("\n=== TESTE 6: height zero ===\n");
 
-    printf("Pixels esperados: %zu\n", total_esperado);
+    resultado = pgm_salva(
+        "erro.pgm",
+        imagem_teste,
+        width,
+        0
+    );
 
-    for (size_t i = 0; i < total_esperado; i++) {
-        imagem[i] = 255;
-    }
+    printf("Resultado: %d\n", resultado);
 
-    printf("Todos os %zu pixels foram escritos.\n", total_esperado);
 
-    free(imagem);
+    printf("\n=== TESTE 7: width negativo ===\n");
+
+    resultado = pgm_salva(
+        "erro.pgm",
+        imagem_teste,
+        -2,
+        height
+    );
+
+    printf("Resultado: %d\n", resultado);
+
+
+    printf("\n=== TESTE 8: height negativo ===\n");
+
+    resultado = pgm_salva(
+        "erro.pgm",
+        imagem_teste,
+        width,
+        -3
+    );
+
+    printf("Resultado: %d\n", resultado);
 
 
     return 0;
 }
+

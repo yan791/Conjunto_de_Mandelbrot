@@ -76,3 +76,57 @@ unsigned char *alloca_imagem(int width, int height) {
 
     return imagem;
 }
+
+int pgm_salva(const char *filename, const unsigned char *image, int width, int height) {
+
+    if (filename == NULL || image == NULL) {
+        fprintf(stderr,"Erro: arquivo ou imagem invalidos.\n");
+        return -1;
+    }
+
+    if (width <= 0 || height <= 0) {
+        fprintf(stderr,"Erro: tamanho da imagem invalido.\n");
+        return -1;
+    }
+
+    FILE *fp = fopen(filename, "w");
+
+    if (fp == NULL) {
+        fprintf(stderr,"Erro: nao foi possivel criar o arquivo '%s' (%s).\n",filename, strerror(errno));
+        return -1;
+    }
+
+    for (int row = 0; row < height; row++) {
+        for (int col = 0; col < width; col++) {
+
+            int value = image[(size_t) row * width + col];
+
+            if (col > 0) {
+                if (fputc(' ', fp) == EOF) {
+                    fprintf(stderr,"Erro: falha ao escrever em '%s'.\n",filename);
+                    fclose(fp);
+                    return -1;
+                }
+            }
+
+            if (fprintf(fp, "%d", value) < 0) {
+                fprintf(stderr,"Erro: falha ao escrever em '%s'.\n",filename);
+                fclose(fp);
+                return -1;
+            }
+        }
+
+        if (fputc('\n', fp) == EOF) {
+            fprintf(stderr,"Erro: falha ao escrever em '%s'.\n",filename);
+            fclose(fp);
+            return -1;
+        }
+    }
+
+    if (fclose(fp) != 0) {
+        fprintf(stderr,"Erro: falha ao finalizar a escrita de '%s' (%s).\n",filename, strerror(errno));
+        return -1;
+    }
+
+    return 0;
+}
