@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <limits.h>
-
 #include "mandelbrot.h"
-
-#define EXIT_ARGS_ERROR  1
-#define EXIT_VALUE_ERROR 2
+#include "login.h"
+#define TIMES_FILE "times.txt"
+#define EXIT_ARGS_ERROR   1
+#define EXIT_VALUE_ERROR  2
 #define EXIT_MEMORY_ERROR 3
-#define EXIT_FILE_ERROR  4
+#define EXIT_FILE_ERROR   4
 
 static int parse_positive_int(const char *text, long *out) {
     if (text == NULL || text[0] == '\0') {
@@ -108,7 +108,14 @@ int main(int argc, char *argv[]) {
     compute_serial(image, &config);
     double t1 = retorna_segundos();
 
-    if (pgm_salva("mandelbrot_serial.pgm",
+    char filename[512];
+
+    snprintf(filename,
+             sizeof(filename),
+             "mandelbrot_%s_serial.pgm",
+             LOGIN);
+
+    if (pgm_salva(filename,
                   image,
                   config.largura,
                   config.altura) != 0) {
@@ -116,7 +123,7 @@ int main(int argc, char *argv[]) {
         return EXIT_FILE_ERROR;
     }
 
-    if (salva_time_log("times.txt",
+    if (salva_time_log(TIMES_FILE,
                        "serial",
                        t1 - t0,
                        1) != 0) {
