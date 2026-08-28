@@ -22,4 +22,5 @@ typedef struct {
 unsigned char *alloca_imagem(int width, int height);
 void compute_serial(unsigned char *image, const config *config);
 int pgm_salva(const char *filename, const unsigned char *image, int width, int height);
+double retorna_segundos(void);
 #endif

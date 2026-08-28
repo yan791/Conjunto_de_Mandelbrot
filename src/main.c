@@ -20,7 +20,11 @@ int main(void) {
         return 1;
     }
 
+    double t0 = retorna_segundos();
     compute_serial(image, &config);
+    double t1 = retorna_segundos();
+
+    printf("Tempo da versao serial: %.6f segundos\n", t1 - t0);
 
     if (pgm_salva(
             "mandelbrot_serial.pgm",

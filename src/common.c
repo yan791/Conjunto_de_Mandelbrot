@@ -130,3 +130,13 @@ int pgm_salva(const char *filename, const unsigned char *image, int width, int h
 
     return 0;
 }
+
+double retorna_segundos(void) {
+    struct timespec ts;
+
+    if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
+        return (double) time(NULL);
+    }
+
+    return (double) ts.tv_sec + (double) ts.tv_nsec / 1e9;
+}
