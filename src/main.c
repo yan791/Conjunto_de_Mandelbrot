@@ -1,14 +1,97 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <limits.h>
+
 #include "mandelbrot.h"
 
-int main(void) {
-    config config;
+#define EXIT_ARGS_ERROR  1
+#define EXIT_VALUE_ERROR 2
+#define EXIT_MEMORY_ERROR 3
+#define EXIT_FILE_ERROR  4
 
-    config.largura = 16;
-    config.altura = 12;
-    config.max_iter = 100;
-    config.threads = 1;
+static int parse_positive_int(const char *text, long *out) {
+    if (text == NULL || text[0] == '\0') {
+        return 0;
+    }
+
+    errno = 0;
+    char *endptr = NULL;
+    long value = strtol(text, &endptr, 10);
+
+    if (errno == ERANGE) {
+        return 0;
+    }
+
+    if (endptr == text || *endptr != '\0') {
+        return 0;
+    }
+
+    if (value <= 0) {
+        return 0;
+    }
+
+    *out = value;
+    return 1;
+}
+
+static void print_usage(const char *prog_name) {
+    fprintf(stderr,
+            "Uso: %s [largura] [altura] [max_iteracoes] [num_threads]\n",
+            prog_name);
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 5) {
+        fprintf(stderr,
+                "Erro: numero incorreto de argumentos.\n");
+        print_usage(argv[0]);
+        return EXIT_ARGS_ERROR;
+    }
+
+    long width_l;
+    long height_l;
+    long max_iter_l;
+    long num_threads_l;
+
+    if (!parse_positive_int(argv[1], &width_l)) {
+        fprintf(stderr,
+                "Erro: largura invalida.\n");
+        return EXIT_VALUE_ERROR;
+    }
+
+    if (!parse_positive_int(argv[2], &height_l)) {
+        fprintf(stderr,
+                "Erro: altura invalida.\n");
+        return EXIT_VALUE_ERROR;
+    }
+
+    if (!parse_positive_int(argv[3], &max_iter_l)) {
+        fprintf(stderr,
+                "Erro: numero maximo de iteracoes invalido.\n");
+        return EXIT_VALUE_ERROR;
+    }
+
+    if (!parse_positive_int(argv[4], &num_threads_l)) {
+        fprintf(stderr,
+                "Erro: numero de threads invalido.\n");
+        return EXIT_VALUE_ERROR;
+    }
+
+    if (width_l > INT_MAX ||
+        height_l > INT_MAX ||
+        max_iter_l > INT_MAX ||
+        num_threads_l > INT_MAX) {
+        fprintf(stderr,
+                "Erro: um dos parametros excede o limite permitido.\n");
+        return EXIT_VALUE_ERROR;
+    }
+
+    config config;
+    config.largura = (int) width_l;
+    config.altura = (int) height_l;
+    config.max_iter = (int) max_iter_l;
+    config.threads = (int) num_threads_l;
 
     unsigned char *image = alloca_imagem(
         config.largura,
@@ -16,37 +99,31 @@ int main(void) {
     );
 
     if (image == NULL) {
-        fprintf(stderr, "Erro: nao foi possivel alocar a imagem.\n");
-        return 1;
+        fprintf(stderr,
+                "Erro: falha ao alocar memoria para a imagem.\n");
+        return EXIT_MEMORY_ERROR;
     }
 
     double t0 = retorna_segundos();
     compute_serial(image, &config);
     double t1 = retorna_segundos();
 
-    if (salva_time_log(
-            "times.txt",
-            "serial",
-            t1 - t0,
-            1) != 0) {
-
-        fprintf(stderr, "Erro: nao foi possivel salvar o tempo.\n");
+    if (pgm_salva("mandelbrot_serial.pgm",
+                  image,
+                  config.largura,
+                  config.altura) != 0) {
         free(image);
-        return 1;
+        return EXIT_FILE_ERROR;
     }
 
-    if (pgm_salva(
-            "mandelbrot_serial.pgm",
-            image,
-            config.largura,
-            config.altura) != 0) {
-
-        fprintf(stderr, "Erro: nao foi possivel salvar a imagem.\n");
+    if (salva_time_log("times.txt",
+                       "serial",
+                       t1 - t0,
+                       1) != 0) {
         free(image);
-        return 1;
+        return EXIT_FILE_ERROR;
     }
 
     free(image);
-
     return 0;
 }
