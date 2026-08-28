@@ -24,7 +24,16 @@ int main(void) {
     compute_serial(image, &config);
     double t1 = retorna_segundos();
 
-    printf("Tempo da versao serial: %.6f segundos\n", t1 - t0);
+    if (salva_time_log(
+            "times.txt",
+            "serial",
+            t1 - t0,
+            1) != 0) {
+
+        fprintf(stderr, "Erro: nao foi possivel salvar o tempo.\n");
+        free(image);
+        return 1;
+    }
 
     if (pgm_salva(
             "mandelbrot_serial.pgm",

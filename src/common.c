@@ -140,3 +140,29 @@ double retorna_segundos(void) {
 
     return (double) ts.tv_sec + (double) ts.tv_nsec / 1e9;
 }
+
+int salva_time_log(const char *filename, const char *label,double seconds, int reset_file) {
+    if (filename == NULL || label == NULL) {
+        return -1;
+    }
+
+    FILE *fp = fopen(filename, reset_file ? "w" : "a");
+
+    if (fp == NULL) {
+        fprintf(stderr,"Erro: nao foi possivel abrir '%s' (%s).\n",filename, strerror(errno));
+        return -1;
+    }
+
+    if (fprintf(fp, "%s: %.6f segundos\n", label, seconds) < 0) {
+        fprintf(stderr,"Erro: falha ao escrever em '%s'.\n",filename);
+        fclose(fp);
+        return -1;
+    }
+
+    if (fclose(fp) != 0) {
+        fprintf(stderr,"Erro: falha ao finalizar a escrita de '%s' (%s).\n",filename, strerror(errno));
+        return -1;
+    }
+
+    return 0;
+}
