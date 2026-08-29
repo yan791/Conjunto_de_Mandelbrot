@@ -26,4 +26,14 @@ double retorna_segundos(void);
 int salva_time_log(const char *filename, const char *label,double seconds, int reset_file);
 void faz_openmp(unsigned char *image, const config *config);
 
+typedef struct {
+    unsigned char *imagem;
+    const config *config;
+    int linha_inicio;
+    int linha_fim;
+    int id;
+    int erro;
+} dadosthread;
+
+int faz_pthreads1(unsigned char *image, const config *config);
 #endif
