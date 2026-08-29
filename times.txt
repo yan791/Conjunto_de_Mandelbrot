@@ -1,1 +1,2 @@
-serial: 0.000007 segundos
+serial: 0.000011 segundos
+openmp: 0.003471 segundos

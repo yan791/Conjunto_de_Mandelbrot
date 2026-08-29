@@ -24,4 +24,6 @@ void compute_serial(unsigned char *image, const config *config);
 int pgm_salva(const char *filename, const unsigned char *image, int width, int height);
 double retorna_segundos(void);
 int salva_time_log(const char *filename, const char *label,double seconds, int reset_file);
+void faz_openmp(unsigned char *image, const config *config);
+
 #endif

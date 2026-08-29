@@ -104,11 +104,14 @@ int main(int argc, char *argv[]) {
         return EXIT_MEMORY_ERROR;
     }
 
-    double t0 = retorna_segundos();
-    compute_serial(image, &config);
-    double t1 = retorna_segundos();
-
     char filename[512];
+    double t0;
+    double t1;
+    int reset_times_file = 1;
+
+    t0 = retorna_segundos();
+    compute_serial(image, &config);
+    t1 = retorna_segundos();
 
     snprintf(filename,
              sizeof(filename),
@@ -126,7 +129,34 @@ int main(int argc, char *argv[]) {
     if (salva_time_log(TIMES_FILE,
                        "serial",
                        t1 - t0,
-                       1) != 0) {
+                       reset_times_file) != 0) {
+        free(image);
+        return EXIT_FILE_ERROR;
+    }
+
+    reset_times_file = 0;
+
+    t0 = retorna_segundos();
+    faz_openmp(image, &config);
+    t1 = retorna_segundos();
+
+    snprintf(filename,
+             sizeof(filename),
+             "mandelbrot_%s_openmp.pgm",
+             LOGIN);
+
+    if (pgm_salva(filename,
+                  image,
+                  config.largura,
+                  config.altura) != 0) {
+        free(image);
+        return EXIT_FILE_ERROR;
+    }
+
+    if (salva_time_log(TIMES_FILE,
+                       "openmp",
+                       t1 - t0,
+                       reset_times_file) != 0) {
         free(image);
         return EXIT_FILE_ERROR;
     }
