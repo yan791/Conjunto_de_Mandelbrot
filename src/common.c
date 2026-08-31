@@ -143,6 +143,7 @@ double retorna_segundos(void) {
 
 int salva_time_log(const char *filename, const char *label,double seconds, int reset_file) {
     if (filename == NULL || label == NULL) {
+        fprintf(stderr,"Erro: nome de arquivo ou rotulo invalidos.\n");
         return -1;
     }
 

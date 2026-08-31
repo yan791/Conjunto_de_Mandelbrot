@@ -44,47 +44,56 @@ int faz_pthreads2(unsigned char *image, const config *config) {
         n = config->altura;
     }
 
+    if (n < 1) {
+        n = 1;
+    }
+
     pthread_t *threads =
-        malloc((size_t) n * sizeof(pthread_t));
+        (pthread_t *) malloc((size_t) n * sizeof(pthread_t));
+
+    if (threads == NULL) {
+        fprintf(stderr,"Erro: falha ao alocar memoria para threads (pthreads2).\n");
+        return -1;
+    }
 
     filatrab fila;
-
     fila.imagem = image;
     fila.config = config;
     fila.proxima_linha = 0;
     fila.erro = 0;
 
+    if (pthread_mutex_init(&fila_mutex, NULL) != 0) {
+        fprintf(stderr, "Erro: falha ao inicializar o mutex (pthreads2).\n");
+        free(threads);
+        return -1;
+    }
+
     int criadas = 0;
 
     for (int i = 0; i < n; i++) {
-        int rc = pthread_create(
-            &threads[i],
-            NULL,
-            pega_linha,
-            &fila
-        );
+        int rc = pthread_create(&threads[i], NULL, pega_linha, &fila);
 
         if (rc != 0) {
-            fprintf(stderr,
-                    "Erro: falha ao criar thread %d.\n",
-                    i);
+            fprintf(stderr,"Erro: falha ao criar thread %d (pthreads2): codigo %d.\n",i, rc);
 
             for (int j = 0; j < criadas; j++) {
                 pthread_join(threads[j], NULL);
             }
 
             free(threads);
+            pthread_mutex_destroy(&fila_mutex);
             return -1;
         }
 
         criadas++;
     }
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < criadas; i++) {
         pthread_join(threads[i], NULL);
     }
 
     free(threads);
+    pthread_mutex_destroy(&fila_mutex);
 
     return 0;
-}   
+}
