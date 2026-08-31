@@ -36,4 +36,14 @@ typedef struct {
 } dadosthread;
 
 int faz_pthreads1(unsigned char *image, const config *config);
+
+typedef struct {
+    unsigned char *imagem;
+    const config *config;
+    int proxima_linha;
+    int erro;
+} filatrab;
+
+int faz_pthreads2(unsigned char *image, const config *config);
+
 #endif
