@@ -20,17 +20,22 @@ static void *faz_bloco(void *arg) {
     return NULL;
 }
 
-int faz_pthreads1(unsigned char *imagem, const config *config) {
+int faz_pthreads1(unsigned char *image, const config *config) {
     int n = config->threads;
 
     if (n > config->altura) {
         n = config->altura;
     }
 
-    pthread_t *threads = malloc((size_t) n * sizeof(pthread_t));
-    dadosthread *dados = malloc((size_t) n * sizeof(dadosthread));
+    if (n < 1) {
+        n = 1;
+    }
+
+    pthread_t *threads = (pthread_t *) malloc((size_t) n * sizeof(pthread_t));
+    dadosthread *dados = (dadosthread *) malloc((size_t) n * sizeof(dadosthread));
 
     if (threads == NULL || dados == NULL) {
+        fprintf(stderr,"Erro: falha ao alocar memoria para threads (pthreads1).\n");
         free(threads);
         free(dados);
         return -1;
@@ -38,29 +43,44 @@ int faz_pthreads1(unsigned char *imagem, const config *config) {
 
     int base = config->altura / n;
     int resto = config->altura % n;
-
-    int linha_atual = 0;
+    int proxima_linha = 0;
+    int criadas = 0;
 
     for (int i = 0; i < n; i++) {
-        int quantidade = base;
+        int linhas = base;
 
         if (i < resto) {
-            quantidade++;
+            linhas++;
         }
 
-        dados[i].imagem = imagem;
+        dados[i].imagem = image;
         dados[i].config = config;
-        dados[i].linha_inicio = linha_atual;
-        dados[i].linha_fim = linha_atual + quantidade;
+        dados[i].linha_inicio = proxima_linha;
+        dados[i].linha_fim = proxima_linha + linhas;
         dados[i].id = i;
         dados[i].erro = 0;
 
-        printf("Thread %d: linhas %d ate %d\n",
-               dados[i].id,
-               dados[i].linha_inicio,
-               dados[i].linha_fim - 1);
+        proxima_linha += linhas;
 
-        linha_atual += quantidade;
+        int rc = pthread_create(&threads[i], NULL, faz_bloco, &dados[i]);
+
+        if (rc != 0) {
+            fprintf(stderr,"Erro: falha ao criar thread %d (pthreads1): codigo %d.\n",i, rc);
+
+            for (int j = 0; j < criadas; j++) {
+                pthread_join(threads[j], NULL);
+            }
+
+            free(threads);
+            free(dados);
+            return -1;
+        }
+
+        criadas++;
+    }
+
+    for (int i = 0; i < criadas; i++) {
+        pthread_join(threads[i], NULL);
     }
 
     free(threads);
